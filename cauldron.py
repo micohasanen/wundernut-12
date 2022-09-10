@@ -2,6 +2,7 @@ import numpy as np
 import requests
 import string
 from PIL import Image
+from wordsegment import load, segment
 
 OCR_API_URL = "https://api.ocr.space"
 OCR_API_KEY = "K81260059888957" # Throw-away key
@@ -25,6 +26,8 @@ def main ():
 	clear_image = Image.fromarray(pixels, 'RGB')
 	clear_image.save('magic.jpg')
 
+	print('✨ I can feel the magic! ✨')
+
 	# Send image to an OCR API
 	clear_file = open('magic.jpg', 'rb')
 	res = requests.post(
@@ -32,7 +35,7 @@ def main ():
 		headers={
 			'apikey': OCR_API_KEY
 		},
-		data={ 'OCREngine': 2 },
+		data={ 'OCREngine': 1 },
 		files={
 			'file': clear_file
 		}
@@ -45,7 +48,12 @@ def main ():
 	decrypted = rotate_text(parsed_text)
 
 	print('\033[93mYour spells have been extracted and decrypted:\033[0m')
-	print(decrypted)
+
+	# To make it a bit more muggle readable, we use a word segmenter to add spaces
+	# The spell names are kept a mystery for muggle safety, 
+	# as muff lia to could be an italian dessert
+	segmented_sentence = segment(decrypted)
+	print(' '.join(segmented_sentence))
 
 def rotate_text (text, n = 5):
 	alphabet = string.ascii_uppercase
@@ -61,4 +69,5 @@ def rotate_text (text, n = 5):
 	return message
 
 if __name__ == "__main__":
+	load()
 	main()
